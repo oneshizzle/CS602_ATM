@@ -3,12 +3,22 @@ package edu.adriennicholas.atm.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.adriennicholas.atm.shared.model.TransactionObject;
 import edu.adriennicholas.atm.shared.model.User;
 import edu.adriennicholas.atm.shared.model.User.UserRole;
 
 public class UserService {
 
+	private SocketUtil socketUtil = new SocketUtil();
+
 	public User login(String username, String password) {
+		TransactionObject transactionObject  = new TransactionObject();
+		transactionObject.setName(username);
+		transactionObject.setNum(password);
+		transactionObject.setId("LOGIN");
+		
+		transactionObject = socketUtil.sendTransaction(transactionObject);
+		
 		User user = null;
 		if (username.equals("BAD")) {
 
@@ -20,8 +30,9 @@ public class UserService {
 		return user;
 	}
 
-	public User createUser(User user) {
-		return new User(null, null, null);
+	public void createUser(User user) {
+		TransactionObject to = new TransactionObject();
+		to.setName(user.getUserName());
 	}
 
 	public List<User> findAccountUsers() {
