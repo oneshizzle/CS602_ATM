@@ -12,16 +12,17 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import edu.adriennicholas.atm.client.controller.TransferPanelController;
+import edu.adriennicholas.atm.shared.model.Account;
 import edu.adriennicholas.atm.util.Utils;
 
 public class TransferPanel extends JPanel {
 
 	private TransferPanelController controller = new TransferPanelController(this);
 
+	private JLabel message = new JLabel();
 	private JButton submit;
 	private JPanel panel;
 	private JTextField amountBox;
-
 	private String[] accountTypes = { "Checking", "Saving" };
 
 	private JComboBox<String> fromAccountList = new JComboBox<String>(accountTypes);
@@ -30,14 +31,22 @@ public class TransferPanel extends JPanel {
 
 	private JButton resetBtn;
 
+	private JTextField savingAmountBox;
+	private JTextField checkingAmountBox;
+	private JLabel checkingAmount = new JLabel("Checking Bal.");
+	private JLabel savingAmount = new JLabel("Saving Bal.");
+
 	private final static int xOffSet = 55;
 	private final static int yOffSet = 80;
 
 	public TransferPanel() {
 		super();
-		submit = new JButton("Transfer");
 		panel = new JPanel();
 		amountBox = Utils.createNumericTextField();
+		savingAmountBox = Utils.createNumericTextField();
+		checkingAmountBox = Utils.createNumericTextField();
+
+		submit = new JButton("Transfer");
 		resetBtn = new JButton("Reset");
 
 		JLabel accountUser = new JLabel("Account User");
@@ -53,23 +62,27 @@ public class TransferPanel extends JPanel {
 
 		heading.setBounds(xOffSet, yOffSet - 63, 230, 20);
 		heading.setHorizontalAlignment(SwingConstants.LEFT);
-		balanceStatus.setBounds(xOffSet, yOffSet - 33, 280, 20);
-		balanceStatus.setHorizontalAlignment(SwingConstants.LEFT);
 
-		accountUser.setBounds(xOffSet, yOffSet + 18, 154, 20);
-		accountUserList.setBounds(xOffSet + 90, yOffSet + 18, 154, 20);
+		accountUser.setBounds(xOffSet, yOffSet, 154, 20);
+		accountUserList.setBounds(xOffSet + 90, yOffSet, 154, 20);
 
-		amount.setBounds(xOffSet, yOffSet + 48, 85, 20);
-		amountBox.setBounds(xOffSet + 90, yOffSet + 48, 154, 20);
+		savingAmountBox.setBounds(xOffSet + 90, yOffSet + 30, 154, 20);
+		savingAmount.setBounds(xOffSet, yOffSet + 30, 80, 20);
 
-		fromAccountList.setBounds(xOffSet + 90, yOffSet + 78, 154, 20);
-		fromAccountType.setBounds(xOffSet, yOffSet + 78, 80, 20);
+		checkingAmountBox.setBounds(xOffSet + 90, yOffSet + 60, 154, 20);
+		checkingAmount.setBounds(xOffSet, yOffSet + 60, 80, 20);
 
-		toAccountList.setBounds(xOffSet + 90, yOffSet + 108, 154, 20);
-		toAccountType.setBounds(xOffSet, yOffSet + 108, 80, 20);
+		amount.setBounds(xOffSet, yOffSet + 90, 85, 20);
+		amountBox.setBounds(xOffSet + 90, yOffSet + 90, 154, 20);
 
-		submit.setBounds(xOffSet, yOffSet + 168, 90, 20);
-		resetBtn.setBounds(xOffSet + 140, yOffSet + 168, 100, 20);
+		fromAccountList.setBounds(xOffSet + 90, yOffSet + 120, 154, 20);
+		fromAccountType.setBounds(xOffSet, yOffSet + 120, 80, 20);
+
+		toAccountList.setBounds(xOffSet + 90, yOffSet + 150, 154, 20);
+		toAccountType.setBounds(xOffSet, yOffSet + 150, 80, 20);
+
+		submit.setBounds(xOffSet, yOffSet + 210, 90, 20);
+		resetBtn.setBounds(xOffSet + 140, yOffSet + 210, 100, 20);
 
 		panel.add(submit);
 		panel.add(amountBox);
@@ -83,6 +96,21 @@ public class TransferPanel extends JPanel {
 		panel.add(toAccountType);
 		panel.add(accountUser);
 		panel.add(accountUserList);
+		panel.add(checkingAmountBox);
+		panel.add(checkingAmount);
+		panel.add(savingAmountBox);
+		panel.add(savingAmount);
+		panel.add(message);
+
+		message.setBounds(xOffSet, yOffSet + 230, 250, 20);
+		message.setHorizontalAlignment(SwingConstants.LEFT);
+		message.setVisible(false);
+
+		amountBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		checkingAmountBox.setEditable(false);
+		checkingAmountBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		savingAmountBox.setEditable(false);
+		savingAmountBox.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		panel.setSize(500, 500);
 		panel.setLayout(null);
@@ -94,7 +122,42 @@ public class TransferPanel extends JPanel {
 
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// controller.attemptLogin();
+				Float amount = 0.0f;
+				
+				if (amountBox.getText() != null && amountBox.getText().length() > 0) {
+					amount = new Float(amountBox.getText());
+				}
+
+				Float checkingBalance = new Float(checkingAmountBox.getText());
+				Float savingBalance = new Float(savingAmountBox.getText());
+
+				enableMessagePanel(false);
+				
+				if (fromAccountList.getSelectedItem().toString().equalsIgnoreCase("Saving")) {
+					if (savingBalance < amount) {
+						setMessagePanelText("Saving balance is not sufficient");
+						enableMessagePanel(true);
+					} else {
+						// controller.tranfer(account);
+					}
+				} else {
+					if (checkingBalance < amount) {
+						setMessagePanelText("Checking balance is not sufficient");
+						enableMessagePanel(true);
+					} else {
+						// controller.tranfer(account);
+					}
+				}
+			}
+
+		});
+
+		accountUserList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+				Account balance = controller.fetchBalance(username);
+				checkingAmountBox.setText(balance.getCheckingBalance().toString());
+				savingAmountBox.setText(balance.getSavingBalance().toString());
 			}
 
 		});
@@ -133,5 +196,13 @@ public class TransferPanel extends JPanel {
 		} else {
 			accountUserList.setEnabled(false);
 		}
+	}
+
+	public void setMessagePanelText(String text) {
+		message.setText("<html><font color='red'>" + text + "</font></html>");
+	}
+
+	public void enableMessagePanel(boolean enable) {
+		message.setVisible(enable);
 	}
 }

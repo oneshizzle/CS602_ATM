@@ -56,8 +56,8 @@ public class MasterController extends AbstractController {
 		return userService;
 	}
 
-	public Account getBalances(String username) {
-		return accountService.getBalance(username);
+	public Account fetchBalance(String username) {
+		return accountService.fetchBalance(username);
 	}
 
 }

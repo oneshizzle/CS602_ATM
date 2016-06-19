@@ -25,6 +25,7 @@ public class WithdrawPanel extends JPanel {
 	private JButton submit;
 	private JPanel panel;
 	private JTextField amountBox;
+	private JTextField balanceBox;
 
 	private String[] accountTypes = { "Checking", "Saving" };
 	private JComboBox<String> accountList = new JComboBox<String>(accountTypes);
@@ -42,36 +43,43 @@ public class WithdrawPanel extends JPanel {
 		submit = new JButton("Withdraw");
 		panel = new JPanel();
 		amountBox = Utils.createNumericTextField();
+		balanceBox = Utils.createNumericTextField();
 		clearBtn = new JButton("Clear?");
 
 		JLabel heading = new JLabel("Please enter the withdrawal details: ");
-		JLabel amountAvailable = new JLabel("Amount Available: " + 100.01);
 		JLabel amountLabel = new JLabel("Amount");
+		JLabel balanceAmount = new JLabel("Balance");
+
 		JLabel accountType = new JLabel("Account Type");
 
 		setLayout(null);
 
-		heading.setBounds(xOffSet, yOffSet - 63, 230, 20);
+		heading.setBounds(xOffSet, yOffSet - 55, 230, 20);
 		heading.setHorizontalAlignment(SwingConstants.LEFT);
-		amountAvailable.setBounds(xOffSet, yOffSet - 33, 230, 20);
-		amountAvailable.setHorizontalAlignment(SwingConstants.LEFT);
+
+		balanceAmount.setBounds(xOffSet, yOffSet - 20, 80, 20);
+		balanceBox.setBounds(xOffSet + 90, yOffSet - 20, 154, 20);
 
 		accountUser.setBounds(xOffSet, yOffSet + 10, 154, 20);
 		accountUserList.setBounds(xOffSet + 90, yOffSet + 10, 154, 20);
 
-		amountBox.setBounds(xOffSet + 90, yOffSet + 35, 154, 20);
-		accountList.setBounds(xOffSet + 90, yOffSet + 65, 154, 20);
+		amountBox.setBounds(xOffSet + 90, yOffSet + 45, 154, 20);
+		amountLabel.setBounds(xOffSet, yOffSet + 45, 80, 20);
 
-		amountLabel.setBounds(xOffSet, yOffSet + 35, 80, 20);
-		accountType.setBounds(xOffSet, yOffSet + 63, 80, 20);
+		accountList.setBounds(xOffSet + 90, yOffSet + 75, 154, 20);
+		accountType.setBounds(xOffSet, yOffSet + 75, 80, 20);
 
 		submit.setBounds(xOffSet, yOffSet + 168, 90, 20);
 		clearBtn.setBounds(xOffSet + 140, yOffSet + 168, 100, 20);
 
-		message.setBounds(xOffSet, yOffSet - 20, 250, 20);
+		message.setBounds(xOffSet, yOffSet +188, 250, 20);
 		message.setHorizontalAlignment(SwingConstants.LEFT);
 		message.setVisible(false);
 
+		balanceBox.setEditable(false);
+		balanceBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		amountBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		panel.add(message);
 		panel.add(submit);
 		panel.add(amountBox);
@@ -79,7 +87,8 @@ public class WithdrawPanel extends JPanel {
 		panel.add(clearBtn);
 		panel.add(amountLabel);
 		panel.add(heading);
-		panel.add(amountAvailable);
+		panel.add(balanceBox);
+		panel.add(balanceAmount);
 		panel.add(accountType);
 		panel.add(accountUserList);
 		panel.add(accountUser);
@@ -92,7 +101,8 @@ public class WithdrawPanel extends JPanel {
 		accountUserList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-				controller.getBalances(username);
+				controller.fetchBalance(username);
+				accountList.setSelectedIndex(accountList.getSelectedIndex());
 			}
 
 		});
@@ -101,6 +111,20 @@ public class WithdrawPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				enableMessagePanel(false);
 				amountBox.setText("");
+			}
+
+		});
+
+		accountList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String accountType = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+				Account currentAccount = controller.fetchBalance(accountUserList.getSelectedItem().toString());
+
+				if (accountType.equalsIgnoreCase("Checking")) {
+					balanceBox.setText(currentAccount.getCheckingBalance().toString());
+				} else {
+					balanceBox.setText(currentAccount.getSavingBalance().toString());
+				}
 			}
 
 		});
@@ -123,7 +147,7 @@ public class WithdrawPanel extends JPanel {
 						accountType = AccountType.CHECKING;
 					}
 
-					Account account = controller.getBalances(controller.getUserSession().getCurrentUser().getUserName());
+					Account account = controller.fetchBalance(controller.getUserSession().getCurrentUser().getUserName());
 					account.setAccountType(accountType);
 					controller.withdraw(account, new Float(amountBox.getText()));
 				}
@@ -144,11 +168,11 @@ public class WithdrawPanel extends JPanel {
 		} else {
 			accountUserList.setEnabled(false);
 		}
+		accountList.setSelectedIndex(0);
 	}
 
 	public void setMessagePanelText(String text) {
 		message.setText("<html><font color='red'>" + text + "</font></html>");
-		message.setHorizontalAlignment(SwingConstants.CENTER);
 	}
 
 	public void enableMessagePanel(boolean enable) {

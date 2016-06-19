@@ -1,6 +1,5 @@
 package edu.adriennicholas.atm.server;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -13,34 +12,32 @@ public class SocketUtil {
 
 	String hostName = "afsaccess2.njit.edu";
 	int portNumber = 28189;
+	private static Socket echoSocket = null;
+	private static ObjectOutputStream outputStream = null;
+	private static ObjectInputStream inputStream = null;
 
 	public TransactionObject sendTransaction(TransactionObject transactionObject) {
 		TransactionObject response = null;
-		Socket echoSocket = null;
 		try {
-			echoSocket = new Socket();
-			SocketAddress endpoint = new InetSocketAddress(hostName, portNumber);
-			echoSocket.connect(endpoint, 1000 * 5);
-			ObjectOutputStream outputStream = new ObjectOutputStream(
-					echoSocket.getOutputStream());
-			ObjectInputStream inputStream = new ObjectInputStream(
-					echoSocket.getInputStream());
-			outputStream.writeObject(transactionObject);
-			while ((response = (TransactionObject) inputStream.readObject()) != null) {
-
+			if (echoSocket == null) {
+				echoSocket = new Socket();
+				SocketAddress endpoint = new InetSocketAddress(hostName, portNumber);
+				echoSocket.connect(endpoint, 1000 * 5);
+				outputStream = new ObjectOutputStream(echoSocket.getOutputStream());
+				inputStream = new ObjectInputStream(echoSocket.getInputStream());
 			}
+
+			System.out.println(transactionObject.getId());
+			outputStream.writeObject(transactionObject);
+
+			if ((response = (TransactionObject) inputStream.readObject()) != null) {
+				System.out.println("Received:=" + response.getMessage());
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (echoSocket != null) {
-				try {
-					echoSocket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-		return transactionObject;
+		return response;
 	}
 
 }

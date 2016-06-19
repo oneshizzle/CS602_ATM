@@ -1,9 +1,12 @@
-package edu.adriennicholas.atm.server;
+package edu.adriennicholas.atm.shared.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
 public class TransactionObject implements Serializable {
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
 	String type;
@@ -72,4 +75,5 @@ public class TransactionObject implements Serializable {
 	public float getAmount() {
 		return amount;
 	}
+
 }

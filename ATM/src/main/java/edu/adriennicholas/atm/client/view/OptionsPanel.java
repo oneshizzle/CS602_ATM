@@ -57,7 +57,7 @@ public class OptionsPanel extends JPanel {
 
 		// Create the panel that contains the "cards".
 		cards.add(new JPanel(), "BLANK");
-		cards.add(new JPanel(), "BALANCE");
+		cards.add(new BalancePanel(), "BALANCE");
 		cards.add(new TransferPanel(), "TRANSFER");
 		cards.add(new DepositPanel(), "DEPOSIT");
 		cards.add(new WithdrawPanel(), "WITHDRAW");
@@ -87,7 +87,10 @@ public class OptionsPanel extends JPanel {
 	public void updateLoggedInUser() {
 		SimpleDateFormat formatter = new SimpleDateFormat("MMM-dd-yyyy HH:MM");
 		String formattedDate = formatter.format(Calendar.getInstance().getTime());
-		headerlabel.setText(UserSession.getInstance().getCurrentUser().getUserName() + " is logged in as "
-				+ UserSession.getInstance().getCurrentUser().getUserRole() + " on " + formattedDate);
+		if (UserSession.getInstance().getCurrentUser() != null) {
+			headerlabel.setText(UserSession.getInstance().getCurrentUser().getUserName() + " is logged in as "
+					+ UserSession.getInstance().getCurrentUser().getUserRole() + " on " + formattedDate);
+		}
 	}
+
 }

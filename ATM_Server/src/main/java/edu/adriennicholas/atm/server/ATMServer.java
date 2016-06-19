@@ -9,77 +9,72 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Calendar;
+
+import oracle.jdbc.driver.OracleDriver;
+import edu.adriennicholas.atm.shared.model.TransactionObject;
 
 public class ATMServer {
 	public static void main(String[] arg) {
 
-		TransactionObject myObject = null;
-
 		try {
 			ServerSocket myServerSocket = new ServerSocket(28189);
-
 			Socket incoming = myServerSocket.accept();
+			ObjectOutputStream myOutputStream = new ObjectOutputStream(incoming.getOutputStream());
+			ObjectInputStream myInputStream = new ObjectInputStream(incoming.getInputStream());
 
-			ObjectOutputStream myOutputStream = new ObjectOutputStream(
-					incoming.getOutputStream());
-
-			ObjectInputStream myInputStream = new ObjectInputStream(
-					incoming.getInputStream());
-
-			myObject = (TransactionObject) myInputStream.readObject();
-
-			System.out.println("Message received : " + myObject.getMessage());
-
-			switch (myObject.getId()) {
-			case "BALANCE":
-				break;
-			case "CREATE":
-				break;
-			case "DELETE":
-				break;
-			case "DEPOSIT":
-				break;
-			case "FREEZE":
-				break;
-			case "TRANSFER":
-				break;
-			case "WITHDRAW":
-				break;
-			case "LOGIN":
-				break;
+			TransactionObject request = null;
+			TransactionObject response = null;
+			while ((request = (TransactionObject) myInputStream.readObject()) != null) {
+				System.out.println("Message received : " + request.getId());
+				switch (request.getId()) {
+				case "FETCH_USERS":
+					response = fetchUsers();
+					break;
+				case "BALANCE":
+					response = fetchAccount(request, true);
+					break;
+				case "CREATE":
+					break;
+				case "DELETE":
+					break;
+				case "DEPOSIT":
+					break;
+				case "FREEZE":
+					break;
+				case "TRANSFER":
+					break;
+				case "WITHDRAW":
+					break;
+				case "LOGIN":
+					response = fetchAccount(request, false);
+					break;
+				}
+				System.out.println(response.getId());
+				myOutputStream.writeObject(response);
 			}
-			// myObject.setMessage("Got it!");
-
-			System.out.println("Message sent : " + myObject.getMessage());
-
-			myOutputStream.writeObject(myObject);
-
-			myOutputStream.close();
-
-			myInputStream.close();
-
-			myServerSocket.close();
 
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 
-	private Connection createConnection() throws SQLException {
+	private static Connection connection = null;
+
+	private static Connection createConnection() throws SQLException {
 		String url = "jdbc:oracle:thin:@prophet.njit.edu:1521:course";
 		String ucid = "an395"; // your ucid
 		String dbpassword = "oxVmnKjQD"; // your Oracle password
 		try {
-			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+			DriverManager.registerDriver(new OracleDriver());
 		} catch (Exception e) {
 			System.err.println("Unable to load driver.");
 			e.printStackTrace();
 		}
 		System.out.println("Driver loaded.");
-		Connection conn = DriverManager.getConnection(url, ucid, dbpassword);
+		if (connection == null)
+			connection = DriverManager.getConnection(url, ucid, dbpassword);
 
-		return conn;
+		return connection;
 	}
 
 	private void updateAccountBalance(TransactionObject transactionObject) {
@@ -94,12 +89,10 @@ public class ATMServer {
 				String username = transactionObject.getName();
 
 				if (accountType.equalsIgnoreCase("CHECKING")) {
-					stmt.executeUpdate("UPDATE ATM_TRANSACTION SET CHECKING_BALANCE="
-							+ amount + " WHERE USERNAME='" + username + "')");
+					stmt.executeUpdate("UPDATE ATM_TRANSACTION SET CHECKING_BALANCE=" + amount + " WHERE USERNAME='" + username + "')");
 
 				} else {
-					stmt.executeUpdate("UPDATE ATM_TRANSACTION SET SAVING_BALANCE="
-							+ amount + " WHERE USERNAME='" + username + "')");
+					stmt.executeUpdate("UPDATE ATM_TRANSACTION SET SAVING_BALANCE=" + amount + " WHERE USERNAME='" + username + "')");
 				}
 
 				System.out.println("Update balance.");
@@ -111,38 +104,66 @@ public class ATMServer {
 		}
 	}
 
-	private TransactionObject fetchAccount(
-			TransactionObject transactionObject) {
+	private static TransactionObject fetchAccount(TransactionObject transactionObject, boolean authorized) {
 		if (transactionObject != null) {
 
 			try {
 				Connection conn = createConnection();
 				Statement stmt = conn.createStatement();
 				String username = transactionObject.getName();
+				String password = transactionObject.getNum();
 
-				ResultSet rs = stmt
-						.executeQuery("SELECT * from ATM_TRANSACTION WHERE USERNAME='"
-								+ username + "'");
+				ResultSet rs = null;
 
-				String balance = "";
+				if (authorized) {
+					rs = stmt.executeQuery("SELECT * from ATM_TRANSACTION WHERE USERNAME='" + username + "'");
+				} else {
+					rs = stmt.executeQuery("SELECT * from ATM_TRANSACTION WHERE PASSWORD='" + password + "' AND USERNAME='" + username + "'");
+				}
+
+				String balance = "saving=0:checking=0";
+				transactionObject.setName(null);
 
 				while (rs.next()) {
-					String savingBalance = (new Float(
-							rs.getFloat("SAVING_BALANCE"))).toString();
-					String checkingBalance = (new Float(
-							rs.getFloat("CHECKING_BALANCE"))).toString();
+					String savingBalance = (new Float(rs.getFloat("SAVING_BALANCE"))).toString();
+					String checkingBalance = (new Float(rs.getFloat("CHECKING_BALANCE"))).toString();
 					transactionObject.setName(rs.getString("USERNAME"));
-					balance = "saving=" + savingBalance + "checking="
-							+ checkingBalance;
+					transactionObject.setNum(rs.getString("PASSWORD"));
+					transactionObject.setId(rs.getString("USERROLE"));
+					transactionObject.setType(rs.getString("STATUS"));
+					balance = "saving=" + savingBalance + ":checking=" + checkingBalance;
 				}
 
 				transactionObject.setMessage(balance);
 				rs.close();
-				System.out.println("Update balance.");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		return transactionObject;
+	}
+
+	private static TransactionObject fetchUsers() {
+		TransactionObject transactionObject = new TransactionObject();
+
+		try {
+			Connection conn = createConnection();
+			Statement stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery("SELECT USERNAME from ATM_TRANSACTION ");
+			transactionObject.setMessage("");
+
+			while (rs.next()) {
+				String username = rs.getString("USERNAME");
+				System.out.println("USERNAME: " + username);
+				transactionObject.setMessage(transactionObject.getMessage() + "," + username);
+			}
+
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return transactionObject;
 	}
@@ -155,8 +176,7 @@ public class ATMServer {
 				Connection conn = createConnection();
 				Statement stmt = conn.createStatement();
 
-				stmt.executeUpdate("UPDATE ATM_TRANSACTION SET STATUS='FROZEN' WHERE USERNAME='"
-						+ username + "')");
+				stmt.executeUpdate("UPDATE ATM_TRANSACTION SET STATUS='FROZEN' WHERE USERNAME='" + username + "')");
 
 				System.out.println("Frozen record.");
 
@@ -173,14 +193,9 @@ public class ATMServer {
 			Connection conn = createConnection();
 			Statement stmt = conn.createStatement();
 
-			stmt.executeUpdate("INSERT INTO ATM_TRANSACTION "
-					+ "VALUES(seq.NEXTVAL" + ",'"
-					+ transactionObject.getAmount() + ","
-					+ transactionObject.getAmount() + ","
-					+ transactionObject.getName() + "','"
-					+ transactionObject.getNum() + "','"
-					+ transactionObject.getMessage() + "','"
-					+ transactionObject.getType() + ")");
+			stmt.executeUpdate("INSERT INTO ATM_TRANSACTION " + "VALUES(seq.NEXTVAL" + "," + transactionObject.getAmount() + ","
+					+ transactionObject.getAmount() + "," + transactionObject.getName() + "','" + transactionObject.getNum() + "','"
+					+ transactionObject.getMessage() + "','" + transactionObject.getType() + "')");
 
 			System.out.println("Inserted data.");
 

@@ -1,6 +1,7 @@
 package edu.adriennicholas.atm.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.adriennicholas.atm.shared.model.TransactionObject;
@@ -12,35 +13,46 @@ public class UserService {
 	private SocketUtil socketUtil = new SocketUtil();
 
 	public User login(String username, String password) {
-		TransactionObject transactionObject  = new TransactionObject();
-		transactionObject.setName(username);
-		transactionObject.setNum(password);
-		transactionObject.setId("LOGIN");
-		
-		transactionObject = socketUtil.sendTransaction(transactionObject);
-		
-		User user = null;
-		if (username.equals("BAD")) {
+		TransactionObject request = new TransactionObject();
+		request.setName(username);
+		request.setNum(password);
+		request.setId("LOGIN");
 
-		} else if (username.equals("ADRIEN")) {
-			user = new User(UserRole.ADMIN, "ADRIEN", true);
-		} else {
-			user = new User(UserRole.USER, username, true);
+		TransactionObject response = socketUtil.sendTransaction(request);
+
+		User user = null;
+		if (response != null && response.getName() != null) {
+			UserRole role = null;
+			if (response.getId().contains("ADMIN")) {
+				role = UserRole.ADMIN;
+			} else {
+				role = UserRole.USER;
+			}
+
+			String status = response.getType();
+			boolean authorized = true;
+			if (status == null || status.trim().length() < 1) {
+				authorized = false;
+			}
+			user = new User(role, response.getName(), authorized);
 		}
+
 		return user;
 	}
 
-	public void createUser(User user) {
-		TransactionObject to = new TransactionObject();
-		to.setName(user.getUserName());
-	}
+	public List<String> findAccountUsers() {
+		TransactionObject request = new TransactionObject();
+		request.setId("FETCH_USERS");
 
-	public List<User> findAccountUsers() {
-		List<User> users = new ArrayList<User>();
-		users.add(new User(UserRole.ADMIN, "ADRIEN", true));
-		users.add(new User(UserRole.ADMIN, "MARSHA", true));
-		users.add(new User(UserRole.ADMIN, "LILIAH", true));
-		users.add(new User(UserRole.ADMIN, "RANEKA", true));
+		TransactionObject response = socketUtil.sendTransaction(request);
+		List<String> users = new ArrayList<String>();
+
+		if (response != null && response.getMessage() != null && response.getMessage().length() > 0) {
+			String temp = response.getMessage();
+			temp = temp.substring(1, temp.length()) + ",";
+			users = Arrays.asList(temp.split(","));
+		}
+
 		return users;
 	}
 }

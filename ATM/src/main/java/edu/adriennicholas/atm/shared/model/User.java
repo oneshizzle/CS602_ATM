@@ -8,6 +8,7 @@ public class User {
 
 	private UserRole userRole;
 	private String userName;
+	private String password;
 	private Boolean authorized = false;
 
 	public User(UserRole userRole, String userName, Boolean authorized) {
@@ -42,6 +43,14 @@ public class User {
 
 	private void setAuthorized(Boolean authorized) {
 		this.authorized = authorized;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String toString() {

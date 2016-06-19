@@ -14,8 +14,6 @@ import javax.swing.SwingConstants;
 import edu.adriennicholas.atm.client.controller.DepositPanelController;
 import edu.adriennicholas.atm.shared.model.Account;
 import edu.adriennicholas.atm.shared.model.Account.AccountType;
-import edu.adriennicholas.atm.shared.model.Account.ActionType;
-import edu.adriennicholas.atm.util.UserSession;
 import edu.adriennicholas.atm.util.Utils;
 
 public class DepositPanel extends JPanel {
@@ -25,6 +23,7 @@ public class DepositPanel extends JPanel {
 	JButton submit;
 	JPanel panel;
 	JTextField amountBox;
+	JTextField balanceBox;
 
 	String[] accountTypes = { "Checking", "Saving" };
 	private JComboBox<String> accountList = new JComboBox<String>(accountTypes);
@@ -41,16 +40,21 @@ public class DepositPanel extends JPanel {
 		submit = new JButton("Deposit");
 		panel = new JPanel();
 		amountBox = Utils.createNumericTextField();
+		balanceBox = Utils.createNumericTextField();
 		clearBtn = new JButton("Clear?");
 
 		JLabel heading = new JLabel("Please enter the deposit details: ");
 		JLabel amount = new JLabel("Amount");
+		JLabel balanceAmount = new JLabel("Balance");
 		JLabel accountType = new JLabel("Account Type");
 
 		setLayout(null);
 
-		heading.setBounds(xOffSet, yOffSet - 73, 200, 20);
+		heading.setBounds(xOffSet, yOffSet - 55, 200, 20);
 		heading.setHorizontalAlignment(SwingConstants.LEFT);
+
+		balanceAmount.setBounds(xOffSet, yOffSet - 20, 80, 20);
+		balanceBox.setBounds(xOffSet + 90, yOffSet - 20, 154, 20);
 
 		accountUser.setBounds(xOffSet, yOffSet + 10, 154, 20);
 		accountUserList.setBounds(xOffSet + 90, yOffSet + 10, 154, 20);
@@ -64,7 +68,7 @@ public class DepositPanel extends JPanel {
 		submit.setBounds(xOffSet, yOffSet + 168, 80, 20);
 		clearBtn.setBounds(xOffSet + 140, yOffSet + 168, 100, 20);
 
-		message.setBounds(xOffSet - 10, yOffSet - 20, 200, 20);
+		message.setBounds(xOffSet, yOffSet + 188, 200, 20);
 		message.setHorizontalAlignment(SwingConstants.LEFT);
 		message.setVisible(false);
 
@@ -78,6 +82,11 @@ public class DepositPanel extends JPanel {
 		panel.add(accountType);
 		panel.add(accountUser);
 		panel.add(accountUserList);
+		panel.add(balanceBox);
+		panel.add(balanceAmount);
+		balanceBox.setEditable(false);
+		amountBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		balanceBox.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		panel.setSize(500, 500);
 		panel.setLayout(null);
@@ -87,7 +96,22 @@ public class DepositPanel extends JPanel {
 		accountUserList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-				controller.getBalances(username);
+				controller.fetchBalance(username);
+				accountList.setSelectedIndex(accountList.getSelectedIndex());
+			}
+
+		});
+
+		accountList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String accountType = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
+				Account currentAccount = controller.fetchBalance(accountUserList.getSelectedItem().toString());
+
+				if (accountType.equalsIgnoreCase("Checking")) {
+					balanceBox.setText(currentAccount.getCheckingBalance().toString());
+				} else {
+					balanceBox.setText(currentAccount.getSavingBalance().toString());
+				}
 			}
 
 		});
@@ -115,10 +139,10 @@ public class DepositPanel extends JPanel {
 						accountType = AccountType.CHECKING;
 					}
 
-					Account account = controller.getBalances(controller.getUserSession().getCurrentUser().getUserName());
+					Account account = controller.fetchBalance(controller.getUserSession().getCurrentUser().getUserName());
 					account.setAccountType(accountType);
 
-					controller.deposit(account, new Float(amount.getText()));
+					controller.deposit(account, new Float(amountBox.getText()));
 				}
 
 			}
@@ -142,11 +166,11 @@ public class DepositPanel extends JPanel {
 		} else {
 			accountUserList.setEnabled(false);
 		}
+		accountList.setSelectedIndex(0);
 	}
 
 	public void setMessagePanelText(String text) {
 		message.setText("<html><font color='red'>" + text + "</font></html>");
-		message.setHorizontalAlignment(SwingConstants.LEFT);
 	}
 
 	public void enableMessagePanel(boolean enable) {

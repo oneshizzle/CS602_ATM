@@ -3,18 +3,18 @@ package edu.adriennicholas.atm.client.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.adriennicholas.atm.client.view.TransferPanel;
-import edu.adriennicholas.atm.server.UserService;
+import edu.adriennicholas.atm.client.view.BalancePanel;
+import edu.adriennicholas.atm.shared.model.Account;
+import edu.adriennicholas.atm.shared.model.Account.AccountType;
 import edu.adriennicholas.atm.shared.model.User;
 import edu.adriennicholas.atm.util.EventMessage;
 import edu.adriennicholas.atm.util.EventType;
 
-public class TransferPanelController extends MasterController {
+public class BalancePanelController extends MasterController {
 
-	private TransferPanel view;
-	private UserService userService = new UserService();
+	private BalancePanel view;
 
-	public TransferPanelController(TransferPanel view) {
+	public BalancePanelController(BalancePanel view) {
 		this.view = view;
 		this.register();
 	}
@@ -25,7 +25,7 @@ public class TransferPanelController extends MasterController {
 			if (eventType == EventType.LOGIN_SUCCESS) {
 				List<String> usernames = new ArrayList<String>();
 				if (getUserSession().getCurrentUser().isAdmin()) {
-					for (String user : userService.findAccountUsers()) {
+					for (String user : getUserService().findAccountUsers()) {
 						usernames.add(user);
 					}
 					view.setAccountUserList(usernames);

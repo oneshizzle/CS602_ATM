@@ -1,25 +1,25 @@
 package edu.adriennicholas.atm.shared.model;
 
 public class Account {
+	
+	private User user;
 
 	public enum AccountType {
 		SAVING, CHECKING
 	}
 
 	public enum ActionType {
-		WITHDRAW, DEPOSIT, TRANSFER, CREATE, FREEZE, DELETE
+		WITHDRAW, DEPOSIT, TRANSFER, CREATE, FREEZE, DELETE, BALANCE
 	}
 
-	public Account(AccountType accountType, String username, Float savingBalance, Float checkingBalance, ActionType action) {
-		setAccountType(accountType);
-		setUserName(username);
+	public Account(User user, Float savingBalance, Float checkingBalance, ActionType action) {
+		setUser(user);
 		setSavingBalance(savingBalance);
 		setCheckingBalance(checkingBalance);
 		setActionType(action);
 	}
 
 	private AccountType accountType;
-	private String userName;
 	private Float savingBalance;
 	private Float checkingBalance;
 	private ActionType action;
@@ -30,14 +30,6 @@ public class Account {
 
 	public void setAccountType(AccountType accountType) {
 		this.accountType = accountType;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	private void setUserName(String userName) {
-		this.userName = userName;
 	}
 
 	public Float getSavingBalance() {
@@ -64,8 +56,16 @@ public class Account {
 		return this.action;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public String toString() {
-		return userName + " " + checkingBalance + " " + accountType + " " + savingBalance;
+		return user + " " + checkingBalance + " " + accountType + " " + savingBalance;
 	}
 
 }

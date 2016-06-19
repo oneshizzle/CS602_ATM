@@ -25,8 +25,8 @@ public class DepositPanelController extends MasterController {
 			if (eventType == EventType.LOGIN_SUCCESS) {
 				List<String> usernames = new ArrayList<String>();
 				if (getUserSession().getCurrentUser().isAdmin()) {
-					for (User user : getUserService().findAccountUsers()) {
-						usernames.add(user.getUserName());
+					for (String user : getUserService().findAccountUsers()) {
+						usernames.add(user);
 					}
 					view.setAccountUserList(usernames);
 				} else {
