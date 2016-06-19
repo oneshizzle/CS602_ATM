@@ -5,11 +5,7 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -58,10 +54,21 @@ public class ATMMainWindow {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Create the panel that contains the "cards".
-		cards.add(new LoginPanel(), "MAIN_PANEL");
+		cards.add(new LoginPanel(), "LOGIN_PANEL");
+		cards.add(new OptionsPanel(), "MAIN_PANEL");
 
 		frame.add(cards, BorderLayout.CENTER);
 		frame.setResizable(false);
+	}
+
+	public void showLoginPanel() {
+		CardLayout cl = (CardLayout) (cards.getLayout());
+		cl.show(cards, "LOGIN_PANEL");
+	}
+
+	public void showMainPanel() {
+		CardLayout cl = (CardLayout) (cards.getLayout());
+		cl.show(cards, "MAIN_PANEL");
 	}
 
 }

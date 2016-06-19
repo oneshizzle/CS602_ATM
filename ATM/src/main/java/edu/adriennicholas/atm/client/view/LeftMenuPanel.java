@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import edu.adriennicholas.atm.client.controller.LeftMenuPanelController;
 
@@ -24,8 +26,9 @@ public class LeftMenuPanel extends JPanel {
 		super();
 		GridLayout gridLayout = new GridLayout(0, 1);
 		setLayout(gridLayout);
-
 		setPreferredSize(new Dimension(125, 10));
+		Border paddingBorder = new EmptyBorder(0, 10, 0, 0);
+		setBorder(paddingBorder);
 
 		add(deposit);
 		add(withdraw);
@@ -33,8 +36,6 @@ public class LeftMenuPanel extends JPanel {
 		add(status);
 		
 		gridLayout.setVgap(Integer.parseInt("10"));
-		gridLayout.setHgap(Integer.parseInt("10"));
-
 		addButtonListeners();
 	}
 

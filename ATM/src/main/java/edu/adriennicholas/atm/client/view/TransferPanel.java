@@ -121,6 +121,12 @@ public class TransferPanel extends JPanel {
 		fromAccountList.setSelectedIndex(0);
 		toAccountList.setSelectedIndex(1);
 
+		resetBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				amountBox.setText("");
+			}
+		});
+
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Float amount = 0.0f;
@@ -198,7 +204,6 @@ public class TransferPanel extends JPanel {
 					fromAccountList.setSelectedIndex(1);
 				}
 			}
-
 		});
 	}
 
@@ -216,6 +221,7 @@ public class TransferPanel extends JPanel {
 	}
 
 	public void refreshUI() {
+		amountBox.setText("");
 		accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
 	}
 

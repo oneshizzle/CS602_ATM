@@ -1,5 +1,6 @@
 package edu.adriennicholas.atm.client.view;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -41,7 +42,14 @@ public class LoginPanel extends JPanel {
 		message = new JLabel();
 
 		setLayout(null);
-
+		JLabel heading = new JLabel("Welcome to CS602 ATM Project");
+		JLabel subheading = new JLabel("Adrien Nicholas");
+		
+		heading.setBounds(xOffSet, yOffSet - 55, 240, 20);
+		heading.setHorizontalAlignment(SwingConstants.CENTER);
+		subheading.setBounds(xOffSet, yOffSet - 35, 240, 20);
+		subheading.setHorizontalAlignment(SwingConstants.CENTER);
+		
 		txuser.setBounds(xOffSet + 74, yOffSet + 28, 154, 20);
 		pass.setBounds(xOffSet + 74, yOffSet + 65, 154, 20);
 		blogin.setBounds(xOffSet, yOffSet + 112, 80, 20);
@@ -59,6 +67,8 @@ public class LoginPanel extends JPanel {
 		loginpanel.add(message);
 		loginpanel.setSize(500, 500);
 		loginpanel.setLayout(null);
+		loginpanel.add(heading);
+		loginpanel.add(subheading);
 		add(loginpanel);
 		setVisible(true);
 

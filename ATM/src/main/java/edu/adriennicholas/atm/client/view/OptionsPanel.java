@@ -2,7 +2,6 @@ package edu.adriennicholas.atm.client.view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -10,11 +9,12 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import edu.adriennicholas.atm.client.controller.OptionsPanelController;
 import edu.adriennicholas.atm.util.UserSession;
@@ -24,30 +24,25 @@ public class OptionsPanel extends JPanel {
 	private OptionsPanelController controller = new OptionsPanelController(this);
 	private JPanel cards = new JPanel(new CardLayout());
 	private JLabel headerlabel = new JLabel();
+	private final static int xOffSet = 50;
+	private final static int yOffSet = 180;
 
 	public OptionsPanel() {
 		super();
 		setLayout(new BorderLayout());
 		JPanel header = new JPanel();
 		header.setLayout(new BorderLayout());
-		Border paddingBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-		// JLabel will be involved for this border
-		Border border = BorderFactory.createLineBorder(Color.BLUE);
-
-		header.setBorder(BorderFactory.createCompoundBorder(border, paddingBorder));
+		Border paddingBorder = new EmptyBorder(10, 10, 10, 10);
+		header.setBorder(paddingBorder);
 
 		headerlabel.setHorizontalTextPosition(JLabel.LEFT);
-
 		header.add(headerlabel, BorderLayout.WEST);
 
 		JButton logOffButton = new JButton("Log Off");
 		logOffButton.addActionListener(new ActionListener() {
-
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				controller.logout();
 			}
-
 		});
 
 		logOffButton.setPreferredSize(new Dimension(100, 40));
@@ -55,8 +50,21 @@ public class OptionsPanel extends JPanel {
 
 		add(header, BorderLayout.NORTH);
 
+		JPanel welcomePanel = new JPanel();
+		welcomePanel.setLayout(null);
+		JLabel heading = new JLabel("Please select an option");
+		JLabel subheading = new JLabel("This financial institution is too small to bail");
+
+		heading.setBounds(xOffSet, yOffSet - 55, 240, 20);
+		heading.setHorizontalAlignment(SwingConstants.CENTER);
+		subheading.setBounds(xOffSet, yOffSet - 15, 240, 20);
+		subheading.setHorizontalAlignment(SwingConstants.CENTER);
+
+		welcomePanel.add(heading);
+		welcomePanel.add(subheading);
+
 		// Create the panel that contains the "cards".
-		cards.add(new JPanel(), "BLANK");
+		cards.add(welcomePanel, "BLANK");
 		cards.add(new BalancePanel(), "BALANCE");
 		cards.add(new TransferPanel(), "TRANSFER");
 		cards.add(new DepositPanel(), "DEPOSIT");

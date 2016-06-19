@@ -98,7 +98,6 @@ public class BalancePanel extends JPanel {
 
 	public void clear() {
 		enableMessagePanel(false);
-		// amountBox.setText("");
 	}
 
 	public void setAccountUserList(List<String> accountUsers) {

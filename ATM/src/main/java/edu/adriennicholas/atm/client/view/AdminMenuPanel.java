@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import edu.adriennicholas.atm.client.controller.AdminMenuPanelController;
 
@@ -23,16 +25,15 @@ public class AdminMenuPanel extends JPanel {
 		GridLayout gridLayout = new GridLayout(0, 1);
 		setLayout(gridLayout);
 
-		setPreferredSize(new Dimension(125, 10));
+		setPreferredSize(new Dimension(135, 10));
+		Border paddingBorder = new EmptyBorder(0, 0, 0, 10);
+		setBorder(paddingBorder);
 
-		// Add buttons to experiment with Grid Layout
 		add(createAccount);
 		add(freezeAccount);
 		add(deleteAccount);
 
 		gridLayout.setVgap(Integer.parseInt("10"));
-		gridLayout.setHgap(Integer.parseInt("10"));
-
 		addButtonListeners();
 	}
 
