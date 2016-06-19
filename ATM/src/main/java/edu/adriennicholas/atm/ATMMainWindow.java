@@ -56,41 +56,12 @@ public class ATMMainWindow {
 
 		frame.setSize(600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JPanel comboBoxPane = new JPanel(); // use FlowLayout
-		String comboBoxItems[] = { "BUTTONPANEL", "TEXTPANEL" };
-		JComboBox cb = new JComboBox(comboBoxItems);
-		cb.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent evt) {
-				CardLayout cl = (CardLayout) (cards.getLayout());
-				cl.show(cards, (String) evt.getItem());
-			}
-		});
-
-		cb.setEditable(false);
-		comboBoxPane.add(cb);
-
-		// Create the "cards".
-		JPanel card1 = new JPanel();
-		card1.add(new JButton("Button 1"));
-		card1.add(new JButton("Button 2"));
-		card1.add(new JButton("Button 3"));
 
 		// Create the panel that contains the "cards".
-		cards.add(new LoginPanel(), "BUTTONPANEL");
-		cards.add(new OptionsPanel(), "TEXTPANEL");
+		cards.add(new LoginPanel(), "MAIN_PANEL");
 
-		frame.add(comboBoxPane, BorderLayout.PAGE_START);
 		frame.add(cards, BorderLayout.CENTER);
 		frame.setResizable(false);
 	}
 
-	public void showLoginPanel() {
-		CardLayout cl = (CardLayout) (cards.getLayout());
-		cl.show(cards, "BUTTONPANEL");
-	}
-
-	public void showMainPanel() {
-		CardLayout cl = (CardLayout) (cards.getLayout());
-		cl.show(cards, "TEXTPANEL");
-	}
 }

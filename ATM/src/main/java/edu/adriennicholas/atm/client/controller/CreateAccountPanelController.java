@@ -26,6 +26,7 @@ public class CreateAccountPanelController extends MasterController {
 
 	public void createAccount(Account account) {
 		getAccountService().createAccount(account);
+		notifyObservers(EventType.USER_ADDED, new EventMessage(""));
 	}
 
 	public void register() {

@@ -9,7 +9,7 @@ public class Account {
 	}
 
 	public enum ActionType {
-		WITHDRAW, DEPOSIT, TRANSFER, CREATE, FREEZE, DELETE, BALANCE
+		WITHDRAW, DEPOSIT, TRANSFER, CREATE, FREEZE, DELETE, BALANCE, REACTIVATE
 	}
 
 	public Account(User user, Float savingBalance, Float checkingBalance, ActionType action) {
@@ -48,7 +48,7 @@ public class Account {
 		this.checkingBalance = amount;
 	}
 
-	private void setActionType(ActionType action) {
+	public void setActionType(ActionType action) {
 		this.action = action;
 	}
 

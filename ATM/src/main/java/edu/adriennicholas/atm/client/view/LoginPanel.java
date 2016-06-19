@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import edu.adriennicholas.atm.client.controller.LoginPanelController;
+import edu.adriennicholas.atm.util.Utils;
 
 public class LoginPanel extends JPanel {
 
@@ -32,7 +33,7 @@ public class LoginPanel extends JPanel {
 		super();
 		blogin = new JButton("Login");
 		loginpanel = new JPanel();
-		txuser = new JTextField(15);
+		txuser = Utils.createUppercaseTextField(15);
 		pass = new JPasswordField(15);
 		newUser = new JButton("New User?");
 		username = new JLabel("Username");
@@ -62,6 +63,13 @@ public class LoginPanel extends JPanel {
 		setVisible(true);
 
 		blogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.attemptLogin(txuser.getText(), pass.getText());
+			}
+
+		});
+
+		pass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.attemptLogin(txuser.getText(), pass.getText());
 			}

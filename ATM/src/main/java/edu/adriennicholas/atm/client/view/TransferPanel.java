@@ -13,6 +13,7 @@ import javax.swing.SwingConstants;
 
 import edu.adriennicholas.atm.client.controller.TransferPanelController;
 import edu.adriennicholas.atm.shared.model.Account;
+import edu.adriennicholas.atm.shared.model.Account.ActionType;
 import edu.adriennicholas.atm.util.Utils;
 
 public class TransferPanel extends JPanel {
@@ -60,7 +61,7 @@ public class TransferPanel extends JPanel {
 
 		setLayout(null);
 
-		heading.setBounds(xOffSet, yOffSet - 63, 230, 20);
+		heading.setBounds(xOffSet, yOffSet - 55, 230, 20);
 		heading.setHorizontalAlignment(SwingConstants.LEFT);
 
 		accountUser.setBounds(xOffSet, yOffSet, 154, 20);
@@ -123,7 +124,7 @@ public class TransferPanel extends JPanel {
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Float amount = 0.0f;
-				
+
 				if (amountBox.getText() != null && amountBox.getText().length() > 0) {
 					amount = new Float(amountBox.getText());
 				}
@@ -132,20 +133,36 @@ public class TransferPanel extends JPanel {
 				Float savingBalance = new Float(savingAmountBox.getText());
 
 				enableMessagePanel(false);
-				
+
 				if (fromAccountList.getSelectedItem().toString().equalsIgnoreCase("Saving")) {
 					if (savingBalance < amount) {
 						setMessagePanelText("Saving balance is not sufficient");
 						enableMessagePanel(true);
 					} else {
-						// controller.tranfer(account);
+						Account account = controller.fetchBalance(accountUserList.getSelectedItem().toString());
+						account.setActionType(ActionType.TRANSFER);
+						account.setSavingBalance(account.getSavingBalance() - amount);
+						account.setCheckingBalance(account.getCheckingBalance() + amount);
+						controller.transfer(account);
+						setMessagePanelText("Transfer Completed.");
+						enableMessagePanel(true);
+						amountBox.setText("");
+						accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
 					}
 				} else {
 					if (checkingBalance < amount) {
 						setMessagePanelText("Checking balance is not sufficient");
 						enableMessagePanel(true);
 					} else {
-						// controller.tranfer(account);
+						Account account = controller.fetchBalance(accountUserList.getSelectedItem().toString());
+						account.setActionType(ActionType.TRANSFER);
+						account.setSavingBalance(account.getSavingBalance() + amount);
+						account.setCheckingBalance(account.getCheckingBalance() - amount);
+						controller.transfer(account);
+						setMessagePanelText("Transfer Completed.");
+						enableMessagePanel(true);
+						amountBox.setText("");
+						accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
 					}
 				}
 			}
@@ -196,6 +213,10 @@ public class TransferPanel extends JPanel {
 		} else {
 			accountUserList.setEnabled(false);
 		}
+	}
+
+	public void refreshUI() {
+		accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
 	}
 
 	public void setMessagePanelText(String text) {

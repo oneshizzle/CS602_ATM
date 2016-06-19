@@ -12,7 +12,6 @@ import edu.adriennicholas.atm.util.EventType;
 public class ModifyAccountPanelController extends MasterController {
 
 	private ModifyAccountPanel view;
-	private UserService userService = new UserService();
 
 	public ModifyAccountPanelController(ModifyAccountPanel view) {
 		this.view = view;
@@ -22,25 +21,26 @@ public class ModifyAccountPanelController extends MasterController {
 	@Override
 	public void update(AbstractController observer, EventType eventType, EventMessage arg1) {
 		if (observer == this) {
-			if (eventType == EventType.LOGIN_SUCCESS) {
-				List<String> usernames = new ArrayList<String>();
-				if (getUserSession().getCurrentUser().isAdmin()) {
-					for (String user : userService.findAccountUsers()) {
-						usernames.add(user);
-					}
-					view.setAccountUserList(usernames);
-				} else {
-					String username = getUserSession().getCurrentUser().getUserName();
-					usernames.add(username);
-					view.setAccountUserList(usernames);
-				}
-
+			if (eventType == EventType.LOGIN_SUCCESS || eventType == EventType.USER_ADDED) {
 			}
 		}
 	}
 
 	public void register() {
-		this.register(EventType.LOGIN_SUCCESS, this);
+		register(EventType.LOGIN_SUCCESS, this);
+		register(EventType.USER_ADDED, this);
+	}
+
+	public void freezeUser(String username) {
+		getAccountService().freezeAccount(username);
+	}
+
+	public void reactiveUser(String username) {
+		getAccountService().reActivateAccount(username);
+	}
+
+	public void deleteUser(String username) {
+		getAccountService().deleteAccount(username);
 	}
 
 }

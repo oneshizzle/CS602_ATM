@@ -10,16 +10,55 @@ public class AccountService {
 
 	private SocketUtil socketUtil = new SocketUtil();
 
-	public Float deposit(Account account) {
-		return 0.0f;
+	public void freezeAccount(String username) {
+		TransactionObject tx = new TransactionObject();
+		tx.setName(username);
+		tx.setId(ActionType.FREEZE.name());
+		socketUtil.sendTransaction(tx);
 	}
 
-	public Float withdraw(Account account) {
-		return 0.0f;
+	public void reActivateAccount(String username) {
+		TransactionObject tx = new TransactionObject();
+		tx.setName(username);
+		tx.setId(ActionType.REACTIVATE.name());
+		socketUtil.sendTransaction(tx);
 	}
 
-	public Float transfer(Account account) {
-		return 0.0f;
+	public void deleteAccount(String username) {
+		TransactionObject tx = new TransactionObject();
+		tx.setName(username);
+		tx.setId(ActionType.DELETE.name());
+		socketUtil.sendTransaction(tx);
+	}
+
+	public void deposit(Account account) {
+		TransactionObject tx = new TransactionObject();
+		tx.setName(account.getUser().getUserName());
+		tx.setId(ActionType.DEPOSIT.name());
+		String message = new String();
+		message = "saving=" + account.getSavingBalance() + ":checking=" + account.getCheckingBalance();
+		tx.setMessage(message);
+		socketUtil.sendTransaction(tx);
+	}
+
+	public void withdraw(Account account) {
+		TransactionObject tx = new TransactionObject();
+		tx.setName(account.getUser().getUserName());
+		tx.setId(ActionType.WITHDRAW.name());
+		String message = new String();
+		message = "saving=" + account.getSavingBalance() + ":checking=" + account.getCheckingBalance();
+		tx.setMessage(message);
+		socketUtil.sendTransaction(tx);
+	}
+
+	public void transfer(Account account) {
+		TransactionObject tx = new TransactionObject();
+		tx.setName(account.getUser().getUserName());
+		tx.setId(ActionType.TRANSFER.name());
+		String message = new String();
+		message = "saving=" + account.getSavingBalance() + ":checking=" + account.getCheckingBalance();
+		tx.setMessage(message);
+		socketUtil.sendTransaction(tx);
 	}
 
 	public Account fetchBalance(String username) {
@@ -29,9 +68,10 @@ public class AccountService {
 
 		TransactionObject txResponse = socketUtil.sendTransaction(tx);
 
-		Float saving = new Float(txResponse.getMessage().substring("saving=".length(), txResponse.getMessage().indexOf(":")));
-		Float checking = new Float(txResponse.getMessage().substring(txResponse.getMessage().indexOf(":") + "checking=".length() + 1,
-				txResponse.getMessage().length()));
+		Float saving = new Float(txResponse.getMessage().substring("saving=".length(),
+				txResponse.getMessage().indexOf(":")));
+		Float checking = new Float(txResponse.getMessage().substring(
+				txResponse.getMessage().indexOf(":") + "checking=".length() + 1, txResponse.getMessage().length()));
 
 		User user = null;
 		UserRole role = null;

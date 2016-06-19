@@ -14,8 +14,6 @@ import javax.swing.SwingConstants;
 import edu.adriennicholas.atm.client.controller.WithdrawPanelController;
 import edu.adriennicholas.atm.shared.model.Account;
 import edu.adriennicholas.atm.shared.model.Account.AccountType;
-import edu.adriennicholas.atm.shared.model.Account.ActionType;
-import edu.adriennicholas.atm.util.UserSession;
 import edu.adriennicholas.atm.util.Utils;
 
 public class WithdrawPanel extends JPanel {
@@ -26,6 +24,7 @@ public class WithdrawPanel extends JPanel {
 	private JPanel panel;
 	private JTextField amountBox;
 	private JTextField balanceBox;
+	Account currentAccount;
 
 	private String[] accountTypes = { "Checking", "Saving" };
 	private JComboBox<String> accountList = new JComboBox<String>(accountTypes);
@@ -72,14 +71,14 @@ public class WithdrawPanel extends JPanel {
 		submit.setBounds(xOffSet, yOffSet + 168, 90, 20);
 		clearBtn.setBounds(xOffSet + 140, yOffSet + 168, 100, 20);
 
-		message.setBounds(xOffSet, yOffSet +188, 250, 20);
+		message.setBounds(xOffSet, yOffSet + 198, 250, 20);
 		message.setHorizontalAlignment(SwingConstants.LEFT);
 		message.setVisible(false);
 
 		balanceBox.setEditable(false);
 		balanceBox.setHorizontalAlignment(SwingConstants.RIGHT);
 		amountBox.setHorizontalAlignment(SwingConstants.RIGHT);
-		
+
 		panel.add(message);
 		panel.add(submit);
 		panel.add(amountBox);
@@ -101,7 +100,7 @@ public class WithdrawPanel extends JPanel {
 		accountUserList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-				controller.fetchBalance(username);
+				currentAccount = controller.fetchBalance(username);
 				accountList.setSelectedIndex(accountList.getSelectedIndex());
 			}
 
@@ -118,15 +117,14 @@ public class WithdrawPanel extends JPanel {
 		accountList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String accountType = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-				Account currentAccount = controller.fetchBalance(accountUserList.getSelectedItem().toString());
-
-				if (accountType.equalsIgnoreCase("Checking")) {
-					balanceBox.setText(currentAccount.getCheckingBalance().toString());
-				} else {
-					balanceBox.setText(currentAccount.getSavingBalance().toString());
+				if (accountUserList != null && accountUserList.getSelectedItem() != null) {
+					if (accountType.equalsIgnoreCase("Checking")) {
+						balanceBox.setText(currentAccount.getCheckingBalance().toString());
+					} else {
+						balanceBox.setText(currentAccount.getSavingBalance().toString());
+					}
 				}
 			}
-
 		});
 
 		submit.addActionListener(new ActionListener() {
@@ -147,13 +145,10 @@ public class WithdrawPanel extends JPanel {
 						accountType = AccountType.CHECKING;
 					}
 
-					Account account = controller.fetchBalance(controller.getUserSession().getCurrentUser().getUserName());
-					account.setAccountType(accountType);
-					controller.withdraw(account, new Float(amountBox.getText()));
+					currentAccount.setAccountType(accountType);
+					controller.withdraw(currentAccount, new Float(amountBox.getText()));
 				}
-
 			}
-
 		});
 	}
 
@@ -177,5 +172,10 @@ public class WithdrawPanel extends JPanel {
 
 	public void enableMessagePanel(boolean enable) {
 		message.setVisible(enable);
+	}
+
+	public void refreshUI() {
+		accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+		accountList.setSelectedIndex(accountList.getSelectedIndex());
 	}
 }

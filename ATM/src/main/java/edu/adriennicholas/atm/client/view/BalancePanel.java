@@ -42,11 +42,10 @@ public class BalancePanel extends JPanel {
 		clearBtn = new JButton("Clear?");
 
 		JLabel heading = new JLabel("Here is your balance information");
-		
 
 		setLayout(null);
 
-		heading.setBounds(xOffSet, yOffSet - 73, 200, 20);
+		heading.setBounds(xOffSet, yOffSet - 55, 200, 20);
 		heading.setHorizontalAlignment(SwingConstants.LEFT);
 
 		accountUser.setBounds(xOffSet, yOffSet + 10, 154, 20);
@@ -61,7 +60,7 @@ public class BalancePanel extends JPanel {
 		message.setBounds(xOffSet - 10, yOffSet - 20, 200, 20);
 		message.setHorizontalAlignment(SwingConstants.LEFT);
 		message.setVisible(false);
-		
+
 		checkingAmountBox.setEditable(false);
 		savingAmountBox.setEditable(false);
 
@@ -123,4 +122,9 @@ public class BalancePanel extends JPanel {
 	public void enableMessagePanel(boolean enable) {
 		message.setVisible(enable);
 	}
+
+	public void refreshUI() {
+		accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+	}
+
 }

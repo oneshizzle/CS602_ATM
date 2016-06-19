@@ -32,6 +32,8 @@ public class DepositPanel extends JPanel {
 	private JButton clearBtn;
 	private JLabel message = new JLabel();
 
+	private Account currentAccount = null;
+
 	private final static int xOffSet = 55;
 	private final static int yOffSet = 80;
 
@@ -68,7 +70,7 @@ public class DepositPanel extends JPanel {
 		submit.setBounds(xOffSet, yOffSet + 168, 80, 20);
 		clearBtn.setBounds(xOffSet + 140, yOffSet + 168, 100, 20);
 
-		message.setBounds(xOffSet, yOffSet + 188, 200, 20);
+		message.setBounds(xOffSet, yOffSet + 198, 200, 20);
 		message.setHorizontalAlignment(SwingConstants.LEFT);
 		message.setVisible(false);
 
@@ -96,31 +98,28 @@ public class DepositPanel extends JPanel {
 		accountUserList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-				controller.fetchBalance(username);
+				currentAccount = controller.fetchBalance(username);
 				accountList.setSelectedIndex(accountList.getSelectedIndex());
 			}
-
 		});
 
 		accountList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String accountType = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-				Account currentAccount = controller.fetchBalance(accountUserList.getSelectedItem().toString());
-
-				if (accountType.equalsIgnoreCase("Checking")) {
-					balanceBox.setText(currentAccount.getCheckingBalance().toString());
-				} else {
-					balanceBox.setText(currentAccount.getSavingBalance().toString());
+				if (accountUserList != null && accountUserList.getSelectedItem() != null) {
+					if (accountType.equalsIgnoreCase("Checking")) {
+						balanceBox.setText(currentAccount.getCheckingBalance().toString());
+					} else {
+						balanceBox.setText(currentAccount.getSavingBalance().toString());
+					}
 				}
 			}
-
 		});
 
 		clearBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				clear();
 			}
-
 		});
 
 		submit.addActionListener(new ActionListener() {
@@ -139,20 +138,21 @@ public class DepositPanel extends JPanel {
 						accountType = AccountType.CHECKING;
 					}
 
-					Account account = controller.fetchBalance(controller.getUserSession().getCurrentUser().getUserName());
-					account.setAccountType(accountType);
-
-					controller.deposit(account, new Float(amountBox.getText()));
+					currentAccount.setAccountType(accountType);
+					controller.deposit(currentAccount, new Float(amountBox.getText()));
 				}
-
 			}
-
 		});
 	}
 
 	public void clear() {
 		enableMessagePanel(false);
 		amountBox.setText("");
+	}
+
+	public void refreshUI() {
+		accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+		accountList.setSelectedIndex(accountList.getSelectedIndex());
 	}
 
 	public void setAccountUserList(List<String> accountUsers) {

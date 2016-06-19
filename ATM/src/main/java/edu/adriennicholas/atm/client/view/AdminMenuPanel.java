@@ -15,7 +15,7 @@ public class AdminMenuPanel extends JPanel {
 	private AdminMenuPanelController controller = new AdminMenuPanelController(this);
 
 	JButton createAccount = new JButton("Create Account");
-	JButton freezeAccount = new JButton("Freeze Account");
+	JButton freezeAccount = new JButton("Modify Account");
 	JButton deleteAccount = new JButton("Delete Account");
 
 	public AdminMenuPanel() {
@@ -32,7 +32,7 @@ public class AdminMenuPanel extends JPanel {
 
 		gridLayout.setVgap(Integer.parseInt("10"));
 		gridLayout.setHgap(Integer.parseInt("10"));
-		
+
 		addButtonListeners();
 	}
 

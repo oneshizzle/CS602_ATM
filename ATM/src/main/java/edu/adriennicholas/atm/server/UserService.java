@@ -40,9 +40,9 @@ public class UserService {
 		return user;
 	}
 
-	public List<String> findAccountUsers() {
+	public List<String> findActiveAccountUsers() {
 		TransactionObject request = new TransactionObject();
-		request.setId("FETCH_USERS");
+		request.setId("FETCH_ACTIVE_USERS");
 
 		TransactionObject response = socketUtil.sendTransaction(request);
 		List<String> users = new ArrayList<String>();
@@ -55,4 +55,21 @@ public class UserService {
 
 		return users;
 	}
+
+	public List<String> findFrozenAccountUsers() {
+		TransactionObject request = new TransactionObject();
+		request.setId("FETCH_FROZEN_USERS");
+
+		TransactionObject response = socketUtil.sendTransaction(request);
+		List<String> users = new ArrayList<String>();
+
+		if (response != null && response.getMessage() != null && response.getMessage().length() > 0) {
+			String temp = response.getMessage();
+			temp = temp.substring(1, temp.length()) + ",";
+			users = Arrays.asList(temp.split(","));
+		}
+
+		return users;
+	}
+
 }

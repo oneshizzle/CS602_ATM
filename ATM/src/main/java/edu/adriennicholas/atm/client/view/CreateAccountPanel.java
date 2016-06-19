@@ -13,7 +13,6 @@ import javax.swing.SwingConstants;
 
 import edu.adriennicholas.atm.client.controller.CreateAccountPanelController;
 import edu.adriennicholas.atm.shared.model.Account;
-import edu.adriennicholas.atm.shared.model.Account.AccountType;
 import edu.adriennicholas.atm.shared.model.Account.ActionType;
 import edu.adriennicholas.atm.shared.model.User;
 import edu.adriennicholas.atm.shared.model.User.UserRole;
@@ -27,6 +26,7 @@ public class CreateAccountPanel extends JPanel {
 	private JTextField savingAmountBox;
 	private JTextField userName;
 	private JTextField password = new JPasswordField(15);
+	private JLabel message = new JLabel();
 
 	private String[] userTypes = { "ADMIN", "CLIENT" };
 	private JComboBox<String> userTypesList = new JComboBox<String>(userTypes);
@@ -45,8 +45,7 @@ public class CreateAccountPanel extends JPanel {
 		panel = new JPanel();
 		checkingAmountBox = Utils.createNumericTextField();
 		savingAmountBox = Utils.createNumericTextField();
-		;
-		userName = new JTextField(15);
+		userName = Utils.createUppercaseTextField(15);
 
 		JLabel heading = new JLabel("Please enter the account details: ");
 		JLabel checkingBalanceLabel = new JLabel("Init. Checking");
@@ -65,19 +64,29 @@ public class CreateAccountPanel extends JPanel {
 
 		checkingBalanceLabel.setBounds(xOffSet, yOffSet + 40, 80, 20);
 		checkingAmountBox.setBounds(xOffSet + 90, yOffSet + 40, 154, 20);
+		checkingAmountBox.setText("0");
 		savingBalanceLabel.setBounds(xOffSet, yOffSet + 70, 80, 20);
 		savingAmountBox.setBounds(xOffSet + 90, yOffSet + 70, 154, 20);
+		savingAmountBox.setText("0");
 
 		accountUser.setBounds(xOffSet, yOffSet + 100, 154, 20);
 		userName.setBounds(xOffSet + 90, yOffSet + 100, 154, 20);
-		
+
 		accountPass.setBounds(xOffSet, yOffSet + 130, 154, 20);
 		password.setBounds(xOffSet + 90, yOffSet + 130, 154, 20);
 
 		submit.setBounds(xOffSet, yOffSet + 168, 90, 20);
 		clearBtn.setBounds(xOffSet + 140, yOffSet + 168, 100, 20);
 
+		checkingAmountBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		savingAmountBox.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		message.setBounds(xOffSet, yOffSet - 10, 200, 20);
+		message.setHorizontalAlignment(SwingConstants.LEFT);
+		message.setVisible(false);
+
 		panel.add(submit);
+		panel.add(message);
 		panel.add(savingAmountBox);
 		panel.add(checkingAmountBox);
 		panel.add(userTypesList);
@@ -105,23 +114,50 @@ public class CreateAccountPanel extends JPanel {
 				} else {
 					userRole = UserRole.USER;
 				}
-				User user = new User(userRole, userName.getText(), true);
-				user.setPassword(password.getText());
-				Float saving = new Float(savingAmountBox.getText());
-				Float checking = new Float(checkingAmountBox.getText());
-				
-				Account account = new Account(user, saving, checking, ActionType.CREATE);
-				controller.createAccount(account);
-			}
 
+				if (userName.getText() == null || userName.getText().length() < 1 || password.getText() == null
+						|| password.getText().length() < 1 || savingAmountBox.getText() == null
+						|| savingAmountBox.getText().length() < 1 || checkingAmountBox.getText() == null
+						|| checkingAmountBox.getText().length() < 1) {
+					setMessagePanelText("Please enter all details");
+					enableMessagePanel(true);
+				} else {
+					User user = new User(userRole, userName.getText(), true);
+					user.setPassword(password.getText());
+					Float saving = new Float(savingAmountBox.getText());
+					Float checking = new Float(checkingAmountBox.getText());
+
+					Account account = new Account(user, saving, checking, ActionType.CREATE);
+					controller.createAccount(account);
+					setMessagePanelText("User: " + user.getUserName() + " added.");
+					clear();
+					enableMessagePanel(true);
+				}
+			}
 		});
 
 		clearBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// controller.attemptLogin();
+				savingAmountBox.setText("");
+				checkingAmountBox.setText("");
+				userName.setText("");
+				password.setText("");
 			}
-
 		});
+	}
 
+	private void clear() {
+		savingAmountBox.setText("");
+		checkingAmountBox.setText("");
+		userName.setText("");
+		password.setText("");
+	}
+
+	public void setMessagePanelText(String text) {
+		message.setText("<html><font color='red'>" + text + "</font></html>");
+	}
+
+	public void enableMessagePanel(boolean enable) {
+		message.setVisible(enable);
 	}
 }
