@@ -15,8 +15,8 @@ import javax.swing.text.DocumentFilter;
 public class Utils {
 
 	public static JFormattedTextField createNumericTextField() {
-		NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
-		DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
+		DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.US);
+		decimalFormat.setMaximumFractionDigits(2);
 		decimalFormat.setGroupingUsed(false);
 		return new JFormattedTextField(decimalFormat);
 	}

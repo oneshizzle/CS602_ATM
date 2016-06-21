@@ -3,6 +3,7 @@ package edu.adriennicholas.atm.client.view;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -88,12 +89,10 @@ public class BalancePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				Account balance = controller.fetchBalance(username);
-				checkingAmountBox.setText(balance.getCheckingBalance().toString());
-				savingAmountBox.setText(balance.getSavingBalance().toString());
+				checkingAmountBox.setText(NumberFormat.getCurrencyInstance().format(balance.getCheckingBalance()));
+				savingAmountBox.setText(NumberFormat.getCurrencyInstance().format(balance.getSavingBalance()));
 			}
-
 		});
-
 	}
 
 	public void clear() {

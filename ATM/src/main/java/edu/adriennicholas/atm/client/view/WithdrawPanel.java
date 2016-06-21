@@ -2,6 +2,7 @@ package edu.adriennicholas.atm.client.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -119,9 +120,11 @@ public class WithdrawPanel extends JPanel {
 				String accountType = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				if (accountUserList != null && accountUserList.getSelectedItem() != null) {
 					if (accountType.equalsIgnoreCase("Checking")) {
-						balanceBox.setText(currentAccount.getCheckingBalance().toString());
+						balanceBox.setText(NumberFormat.getCurrencyInstance().format(
+								currentAccount.getCheckingBalance()));
 					} else {
-						balanceBox.setText(currentAccount.getSavingBalance().toString());
+						balanceBox.setText(NumberFormat.getCurrencyInstance().format(
+								currentAccount.getSavingBalance()));
 					}
 				}
 			}
@@ -133,7 +136,7 @@ public class WithdrawPanel extends JPanel {
 				if (amountBox.getText() == null || amountBox.getText().length() < 1) {
 					setMessagePanelText("Please enter the dollar amount");
 					enableMessagePanel(true);
-				} else if (new Float(amountBox.getText()) > 100) {
+				} else if (new Float(amountBox.getText()) > (new Float(balanceBox.getText()))) {
 					setMessagePanelText("Your balance is too low to withdraw !!");
 					enableMessagePanel(true);
 				} else {

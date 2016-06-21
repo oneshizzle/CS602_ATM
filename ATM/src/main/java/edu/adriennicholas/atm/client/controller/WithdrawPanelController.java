@@ -44,11 +44,11 @@ public class WithdrawPanelController extends MasterController {
 
 	public void withdraw(Account account, Float amount) {
 		if (account.getAccountType().equals(AccountType.CHECKING)) {
-			account.setCheckingBalance(account.getCheckingBalance() + amount);
+			account.setCheckingBalance(account.getCheckingBalance() - amount);
 			view.setMessagePanelText("The new balance is: " + account.getCheckingBalance());
 
 		} else {
-			account.setSavingBalance(account.getSavingBalance() + amount);
+			account.setSavingBalance(account.getSavingBalance() - amount);
 			view.setMessagePanelText("The new balance is: " + account.getSavingBalance());
 		}
 
