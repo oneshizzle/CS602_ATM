@@ -14,11 +14,15 @@ import javax.swing.text.DocumentFilter;
 
 public class Utils {
 
-	public static JFormattedTextField createNumericTextField() {
+	public static NumberFormat createNumberFormat() {
 		DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.US);
 		decimalFormat.setMaximumFractionDigits(2);
 		decimalFormat.setGroupingUsed(false);
-		return new JFormattedTextField(decimalFormat);
+		return decimalFormat;
+	}
+
+	public static JFormattedTextField createNumericTextField() {
+		return new JFormattedTextField(createNumberFormat());
 	}
 
 	public static JTextField createUppercaseTextField(int length) {

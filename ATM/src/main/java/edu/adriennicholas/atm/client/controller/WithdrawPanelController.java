@@ -1,5 +1,6 @@
 package edu.adriennicholas.atm.client.controller;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,11 +46,11 @@ public class WithdrawPanelController extends MasterController {
 	public void withdraw(Account account, Float amount) {
 		if (account.getAccountType().equals(AccountType.CHECKING)) {
 			account.setCheckingBalance(account.getCheckingBalance() - amount);
-			view.setMessagePanelText("The new balance is: " + account.getCheckingBalance());
+			view.setMessagePanelText("The new balance is: " + NumberFormat.getCurrencyInstance().format(account.getCheckingBalance()));
 
 		} else {
 			account.setSavingBalance(account.getSavingBalance() - amount);
-			view.setMessagePanelText("The new balance is: " + account.getSavingBalance());
+			view.setMessagePanelText("The new balance is: " + NumberFormat.getCurrencyInstance().format(account.getSavingBalance()));
 		}
 
 		getAccountService().deposit(account);

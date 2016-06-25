@@ -2,6 +2,8 @@ package edu.adriennicholas.atm.client.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -123,64 +125,72 @@ public class TransferPanel extends JPanel {
 
 		resetBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				amountBox.setText("");
+				refreshUI();
 			}
 		});
 
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Float amount = 0.0f;
+				try {
 
-				if (amountBox.getText() != null && amountBox.getText().length() > 0) {
-					amount = new Float(amountBox.getText());
-				}
+					Float amount = 0.0f;
 
-				Float checkingBalance = new Float(checkingAmountBox.getText());
-				Float savingBalance = new Float(savingAmountBox.getText());
-
-				enableMessagePanel(false);
-
-				if (fromAccountList.getSelectedItem().toString().equalsIgnoreCase("Saving")) {
-					if (savingBalance < amount) {
-						setMessagePanelText("Saving balance is not sufficient");
-						enableMessagePanel(true);
-					} else {
-						Account account = controller.fetchBalance(accountUserList.getSelectedItem().toString());
-						account.setActionType(ActionType.TRANSFER);
-						account.setSavingBalance(account.getSavingBalance() - amount);
-						account.setCheckingBalance(account.getCheckingBalance() + amount);
-						controller.transfer(account);
-						setMessagePanelText("Transfer Completed.");
-						enableMessagePanel(true);
-						amountBox.setText("");
-						accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+					if (amountBox.getText() != null && amountBox.getText().length() > 0) {
+						amount = new Float(amountBox.getText());
 					}
-				} else {
-					if (checkingBalance < amount) {
-						setMessagePanelText("Checking balance is not sufficient");
-						enableMessagePanel(true);
+
+					Float checkingBalance = NumberFormat.getCurrencyInstance().parse(checkingAmountBox.getText())
+							.floatValue();
+					Float savingBalance = NumberFormat.getCurrencyInstance().parse(savingAmountBox.getText())
+							.floatValue();
+
+					enableMessagePanel(false);
+
+					if (fromAccountList.getSelectedItem().toString().equalsIgnoreCase("Saving")) {
+						if (savingBalance < amount) {
+							setMessagePanelText("Saving balance is not sufficient");
+							enableMessagePanel(true);
+						} else {
+							Account account = controller.fetchBalance(accountUserList.getSelectedItem().toString());
+							account.setActionType(ActionType.TRANSFER);
+							account.setSavingBalance(account.getSavingBalance() - amount);
+							account.setCheckingBalance(account.getCheckingBalance() + amount);
+							controller.transfer(account);
+							setMessagePanelText("Transfer Completed.");
+							enableMessagePanel(true);
+							amountBox.setText("");
+							accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+						}
 					} else {
-						Account account = controller.fetchBalance(accountUserList.getSelectedItem().toString());
-						account.setActionType(ActionType.TRANSFER);
-						account.setSavingBalance(account.getSavingBalance() + amount);
-						account.setCheckingBalance(account.getCheckingBalance() - amount);
-						controller.transfer(account);
-						setMessagePanelText("Transfer Completed.");
-						enableMessagePanel(true);
-						amountBox.setText("");
-						accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+						if (checkingBalance < amount) {
+							setMessagePanelText("Checking balance is not sufficient");
+							enableMessagePanel(true);
+						} else {
+							Account account = controller.fetchBalance(accountUserList.getSelectedItem().toString());
+							account.setActionType(ActionType.TRANSFER);
+							account.setSavingBalance(account.getSavingBalance() + amount);
+							account.setCheckingBalance(account.getCheckingBalance() - amount);
+							controller.transfer(account);
+							setMessagePanelText("Transfer Completed.");
+							enableMessagePanel(true);
+							amountBox.setText("");
+							accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
+						}
 					}
+
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			}
-
 		});
 
 		accountUserList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
 				Account balance = controller.fetchBalance(username);
-				checkingAmountBox.setText(balance.getCheckingBalance().toString());
-				savingAmountBox.setText(balance.getSavingBalance().toString());
+				checkingAmountBox.setText(NumberFormat.getCurrencyInstance().format(balance.getCheckingBalance()));
+				savingAmountBox.setText(NumberFormat.getCurrencyInstance().format(balance.getSavingBalance()));
 			}
 
 		});
@@ -222,6 +232,7 @@ public class TransferPanel extends JPanel {
 
 	public void refreshUI() {
 		amountBox.setText("");
+		enableMessagePanel(false);
 		accountUserList.setSelectedIndex(accountUserList.getSelectedIndex());
 	}
 

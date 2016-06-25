@@ -3,6 +3,7 @@ package edu.adriennicholas.atm.client.view;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -123,8 +124,7 @@ public class WithdrawPanel extends JPanel {
 						balanceBox.setText(NumberFormat.getCurrencyInstance().format(
 								currentAccount.getCheckingBalance()));
 					} else {
-						balanceBox.setText(NumberFormat.getCurrencyInstance().format(
-								currentAccount.getSavingBalance()));
+						balanceBox.setText(NumberFormat.getCurrencyInstance().format(currentAccount.getSavingBalance()));
 					}
 				}
 			}
@@ -132,24 +132,31 @@ public class WithdrawPanel extends JPanel {
 
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				enableMessagePanel(false);
-				if (amountBox.getText() == null || amountBox.getText().length() < 1) {
-					setMessagePanelText("Please enter the dollar amount");
-					enableMessagePanel(true);
-				} else if (new Float(amountBox.getText()) > (new Float(balanceBox.getText()))) {
-					setMessagePanelText("Your balance is too low to withdraw !!");
-					enableMessagePanel(true);
-				} else {
-					String type = accountList.getSelectedItem().toString();
-					AccountType accountType = null;
-					if (type.equalsIgnoreCase("Saving")) {
-						accountType = AccountType.SAVING;
+				try {
+
+					enableMessagePanel(false);
+					if (amountBox.getText() == null || amountBox.getText().length() < 1) {
+						setMessagePanelText("Please enter the dollar amount");
+						enableMessagePanel(true);
+					} else if (Utils.createNumberFormat().parse(amountBox.getText()).floatValue() > (NumberFormat
+							.getCurrencyInstance().parse(balanceBox.getText()).floatValue())) {
+						setMessagePanelText("Your balance is too low to withdraw !!");
+						enableMessagePanel(true);
 					} else {
-						accountType = AccountType.CHECKING;
+						String type = accountList.getSelectedItem().toString();
+						AccountType accountType = null;
+						if (type.equalsIgnoreCase("Saving")) {
+							accountType = AccountType.SAVING;
+						} else {
+							accountType = AccountType.CHECKING;
+						}
+
+						currentAccount.setAccountType(accountType);
+						controller.withdraw(currentAccount, new Float(amountBox.getText()));
 					}
 
-					currentAccount.setAccountType(accountType);
-					controller.withdraw(currentAccount, new Float(amountBox.getText()));
+				} catch (NumberFormatException | ParseException e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
