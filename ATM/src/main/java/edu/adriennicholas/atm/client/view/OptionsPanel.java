@@ -93,7 +93,7 @@ public class OptionsPanel extends JPanel {
 	}
 
 	public void updateLoggedInUser() {
-		SimpleDateFormat formatter = new SimpleDateFormat("MMM-dd-yyyy HH:MM");
+		SimpleDateFormat formatter = new SimpleDateFormat("MMM-dd-yyyy");
 		String formattedDate = formatter.format(Calendar.getInstance().getTime());
 		if (UserSession.getInstance().getCurrentUser() != null) {
 			headerlabel.setText(UserSession.getInstance().getCurrentUser().getUserName() + " is logged in as "
