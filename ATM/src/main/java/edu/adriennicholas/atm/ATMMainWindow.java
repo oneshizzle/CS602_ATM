@@ -3,6 +3,7 @@ package edu.adriennicholas.atm;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.Panel;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -24,6 +25,7 @@ public class ATMMainWindow {
 	public static void main(String[] args) {
 		ATMMainWindow window = new ATMMainWindow();
 		window.frame.setVisible(true);
+		window.showLoginPanel();
 	}
 
 	/**
@@ -39,12 +41,13 @@ public class ATMMainWindow {
 	private void initialize() {
 		frame = new JFrame();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		frame.setLocation(dim.width / 2 - frame.getSize().width / 2, 100);
+		frame.setLocation(dim.width / 2 - 300, dim.height / 2 - 300);
 
 		frame.setSize(600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Create the panel that contains the "cards".
+		cards.add(new Panel());
 		cards.add(new LoginPanel(), "LOGIN_PANEL");
 		cards.add(new OptionsPanel(), "MAIN_PANEL");
 
@@ -61,5 +64,4 @@ public class ATMMainWindow {
 		CardLayout cl = (CardLayout) (cards.getLayout());
 		cl.show(cards, "MAIN_PANEL");
 	}
-
 }

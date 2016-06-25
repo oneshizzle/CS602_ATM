@@ -1,6 +1,5 @@
 package edu.adriennicholas.atm.client.view;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,6 +14,15 @@ import edu.adriennicholas.atm.client.controller.LoginPanelController;
 import edu.adriennicholas.atm.util.Utils;
 
 public class LoginPanel extends JPanel {
+
+	@Override
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		txuser.setText("");
+		pass.setText("");
+		txuser.setRequestFocusEnabled(true);
+		txuser.requestFocusInWindow();
+	}
 
 	private LoginPanelController controller = new LoginPanelController(this);
 
@@ -44,12 +52,12 @@ public class LoginPanel extends JPanel {
 		setLayout(null);
 		JLabel heading = new JLabel("Welcome to CS602 ATM Project");
 		JLabel subheading = new JLabel("Adrien Nicholas");
-		
+
 		heading.setBounds(xOffSet, yOffSet - 55, 240, 20);
 		heading.setHorizontalAlignment(SwingConstants.CENTER);
 		subheading.setBounds(xOffSet, yOffSet - 35, 240, 20);
 		subheading.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
 		txuser.setBounds(xOffSet + 74, yOffSet + 28, 154, 20);
 		pass.setBounds(xOffSet + 74, yOffSet + 65, 154, 20);
 		blogin.setBounds(xOffSet, yOffSet + 112, 80, 20);
@@ -71,7 +79,10 @@ public class LoginPanel extends JPanel {
 		loginpanel.add(subheading);
 		add(loginpanel);
 		setVisible(true);
-
+		
+		txuser.setRequestFocusEnabled(true);
+		txuser.requestFocusInWindow();
+		
 		blogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.attemptLogin(txuser.getText(), pass.getText());
@@ -85,6 +96,7 @@ public class LoginPanel extends JPanel {
 			}
 
 		});
+
 	}
 
 	public void setMessagePanelText(String text) {
