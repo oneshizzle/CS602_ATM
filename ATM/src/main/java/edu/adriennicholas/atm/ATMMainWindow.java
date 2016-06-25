@@ -3,7 +3,6 @@ package edu.adriennicholas.atm;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -23,16 +22,8 @@ public class ATMMainWindow {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ATMMainWindow window = new ATMMainWindow();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		ATMMainWindow window = new ATMMainWindow();
+		window.frame.setVisible(true);
 	}
 
 	/**
